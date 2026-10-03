@@ -1,48 +1,1 @@
--- Window rules. Deploy writes ~/.config/hypr/dms/windowrules.lua
--- dms/windowrules.lua
--- Window rules not already covered in the main hyprland.lua
--- App tiling
-hl.window_rule({ match = { class = "^(org\\.telegram\\.desktop)$" }, tile = true })
--- Floating
-hl.window_rule({ match = { class = "^(org\\.gnome\\.Shotwell)$" }, float = true })
--- Performance: disable blur/animation/force full opacity on heavy apps
-local heavy_apps = {
-    "firefox",
-    "brave-browser",
-    "google-chrome",
-    "chromium",
-    "VirtualBox Machine",
-    "VirtualBox Manager",
-    "mpv",
-}
-for _, class in ipairs(heavy_apps) do
-    hl.window_rule({
-        match = { class = "^(" .. class .. ")$" },
-        no_blur = true,
-        opacity = "1.0 override 1.0 override",
-        animation = "none",
-    })
-end
-hl.window_rule({ match = { class = "^(Spotify)$" }, opacity = "1.0 override 1.0 override" })
--- mpv: floating, centered, fixed size
-hl.window_rule({ match = { class = "^(mpv)$" }, float = true })
-hl.window_rule({ match = { class = "^(mpv)$" }, center = true })
-hl.window_rule({ match = { class = "^(mpv)$" }, size = "1280 720" })
--- fdm: floating, centered, fixed size
-hl.window_rule({ match = { class = "^(fdm)$" }, float = true })
-hl.window_rule({ match = { class = "^(fdm)$" }, center = true })
-hl.window_rule({ match = { class = "^(fdm)$" }, size = "1280 720" })
--- Evince (PDF viewer): floating, centered
-hl.window_rule({ match = { class = "^(org.gnome.Evince)$" }, float = true })
-hl.window_rule({ match = { class = "^(org.gnome.Evince)$" }, center = true })
--- Global blur off, re-enabled only for select apps
-hl.window_rule({ match = { class = ".*" }, no_blur = true })
-local blur_allowed = { "thunar", "code", "kitty", "md.obsidian.Obsidian" }
-for _, class in ipairs(blur_allowed) do
-    hl.window_rule({
-        match = { class = "^(" .. class .. ")$" },
-        no_blur = false,
-        rounding = 12,
-        opacity = "0.92 override 0.90 override",
-    })
-end
+-- dms/windowrules.lua-- Deploy writes ~/.config/hypr/dms/windowrules.lua-- Rules not already covered in the main hyprland.lua---- NOTE: in Hyprland later rules override earlier ones, so the order here is:--   1) global defaults  ->  2) per-app overrides  ->  3) floating/size rules----------------------------------------------------------------------------- Helpers----------------------------------------------------------------------------- Build an anchored regex that matches any class in the list: ^(a|b|c)$local function classes(list)    local escaped = {}    for _, c in ipairs(list) do        -- escape regex metacharacters (dots in app IDs, etc.)        escaped[#escaped + 1] = (c:gsub("([%.%+%-%*%?%[%]%(%)%^%$])", "\\%1"))    end    return "^(" .. table.concat(escaped, "|") .. ")$"end-- Apply one rule to a list of classes (extra props go in `props`)local function rule(list, props)    props.match = { class = classes(list) }    hl.window_rule(props)end----------------------------------------------------------------------------- 1) Global defaults: blur OFF everywhere, enabled only for select apps---------------------------------------------------------------------------hl.window_rule({ match = { class = ".*" }, no_blur = true })rule({ "thunar", "code", "kitty", "md.obsidian.Obsidian" }, {    no_blur  = false,    rounding = 12,    opacity  = "0.92 override 0.90 override",})----------------------------------------------------------------------------- 2) Performance: heavy apps -> no blur, full opacity, no animation---------------------------------------------------------------------------rule({    -- browsers    "firefox", "brave-browser", "google-chrome", "chromium",    -- media    "mpv", "Spotify",    -- virtualization    "VirtualBox", "VirtualBox Manager", "VirtualBox Machine",    "VirtualBox VM", "VirtualBoxVM",}, {    no_blur   = true,    opacity   = "1.0 override 1.0 override",    animation = "none",})----------------------------------------------------------------------------- 3) Tiling / floating behavior----------------------------------------------------------------------------- Always tiledrule({ "org.telegram.desktop" }, { tile = true })-- Floating, centered, fixed 1280x720rule({ "mpv", "fdm" }, {    float  = true,    center = true,    size   = "1280 720",})-- Floating + centered (size left to the app)rule({ "org.gnome.Evince", "org.gnome.Shotwell" }, {    float  = true,    center = true,})-- VirtualBox: VM viewports always float so they don't get squashed by tilingrule({ "VirtualBox VM", "VirtualBoxVM", "VirtualBox Machine" }, {    float  = true,    center = true,})-- VirtualBox: dialogs (Settings / Preferences) floatfor _, suffix in ipairs({ "Settings", "Preferences" }) do    hl.window_rule({        match = { class = classes({ "VirtualBox", "VirtualBox Manager" }), title = ".* - " .. suffix },        float  = true,        center = true,    })end----------------------------------------------------------------------------- 4) Generic dialogs -> float (file pickers, auth prompts, etc.)---------------------------------------------------------------------------hl.window_rule({    match = { title = "^(Open File|Save File|Save As|Choose.*|Select.*|Authentication Required)$" },    float  = true,    center = true,})
