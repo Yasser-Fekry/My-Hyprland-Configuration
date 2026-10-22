@@ -19,6 +19,14 @@ hl.bind("Scroll_Lock",      run("brightnessctl --device='*::scrolllock' set 1"))
 hl.bind("SUPER + D",        run("rofi -show drun -show-icons"))
 -- hl.bind("SUPER + minus", run("bash ~/.local/bin/hypr-minimize.sh"))
 
+-- Define the launcher toggle shortcut
+local mainMod = "SUPER"
+local ipc = "noctalia msg "
+-- Core keybind for Noctalia launcher
+hl.bind(mainMod .. " + Space", hl.dsp.exec_cmd(ipc .. "panel-toggle launcher"))
+
+
+
 ---------------------------------------------------------------------------
 -- Window management
 ---------------------------------------------------------------------------
@@ -64,6 +72,9 @@ for i = 1, 10 do
     hl.bind("SUPER + SHIFT + " .. key,   dispatch("movetoworkspace " .. i))
     hl.bind("SUPER + ALT + " .. key,     dispatch("movetoworkspacesilent " .. i))
 end
+
+
+----
 
 hl.bind("SUPER + mouse_down", dispatch("workspace e+1"))
 hl.bind("SUPER + mouse_up",   dispatch("workspace e-1"))
