@@ -166,7 +166,23 @@ end
 -- Minimize / restore the focused window
 hl.bind("SUPER + X", toggle_minimize)
 
--- Show/hide the minimized windows so you can pick one to restore
+-- Show/hide the minimized windowzs so you can pick one to restore
 hl.bind("SUPER + SHIFT + X", function()
 	hl.dispatch(hl.dsp.workspace.toggle_special("minimize"))
 end)
+
+-----
+
+hl.config({
+    input = {
+        follow_mouse = 1,          -- focus the window under the cursor, no click needed
+        float_switch_override_focus = 2,
+    },
+    misc = {
+        focus_on_activate = true,  -- focus windows that request attention / open
+    },
+    cursor = {
+        warp_on_change_workspace = 1, -- cursor jumps to the focused window on workspace change
+        no_warps = false,             -- allow the cursor to warp to newly focused windows
+    },
+})
