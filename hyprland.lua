@@ -186,3 +186,14 @@ hl.config({
         no_warps = false,             -- allow the cursor to warp to newly focused windows
     },
 })
+
+
+---- Minimaze Section 
+
+hl.bind("SUPER + B", hl.dsp.window.move({ workspace = "special:magic", follow = false }))
+
+-- Restore: open the special workspace, then move its window to the current workspace
+hl.bind("SUPER + SHIFT + B", function()
+    hl.dispatch(hl.dsp.workspace.toggle_special("magic"))
+    hl.dispatch(hl.dsp.window.move({ workspace = "+0" }))
+end)
