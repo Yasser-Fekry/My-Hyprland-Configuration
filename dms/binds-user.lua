@@ -87,7 +87,7 @@ hl.bind("SUPER + SHIFT + S", dispatch("movetoworkspace special:magic"))
 ---------------------------------------------------------------------------
 -- Apps / utilities
 ---------------------------------------------------------------------------
-hl.bind("SUPER + B",         run("firefox"))
+-- hl.bind("SUPER + B",         run("firefox"))
 hl.bind("SUPER + SHIFT + V", run("cliphist list | rofi -dmenu | cliphist decode | wl-copy")) -- clipboard history
 hl.bind("SUPER + SHIFT + C", run("hyprpicker -a"))                                           -- color picker -> clipboard
 hl.bind("SUPER + SHIFT + L", run("loginctl lock-session"))                                   -- lock screen
